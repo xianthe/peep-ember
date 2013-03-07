@@ -8,6 +8,12 @@ App.Router.map(function() {
   });  
 });
 
+App.ApplicationRoute = Ember.Route.extend({
+  setupController: function() {
+    this.controllerFor('food').set('model', App.Food.find());
+  }
+});
+
 //Ember generates much of the detail code of the master - detail model 
 App.TablesRoute = Ember.Route.extend({
 	model: function() {
@@ -22,6 +28,7 @@ App.TablesRoute = Ember.Route.extend({
 // ====================
 // App.TableRoute = Ember.Route.extend({
 //   model: function(params) {
+//     //debugger;
 //     return App.Table.find(params.id); //get all tables in this resturant
 //   }
 // });
@@ -42,7 +49,18 @@ App.TablesController = Ember.ArrayController.extend();
 //singular controller - proxy to attributes
 // App.TableController = Ember.ObjectController.extend();
 
-App.FoodController = Ember.ArrayController.extend();
+App.FoodController = Ember.ArrayController.extend({
+  addFood: function(food){
+    var table = this.controllerFor('table').get('model'),
+      tabItems = table.get('tab.tabItems');
+    tabItems.createRecord({
+      food: food,
+      cents: food.get('cents')
+    });
+  }
+});
+
+App.TabController = Ember.ObjectController.extend();
 
 // Models
 
@@ -64,6 +82,14 @@ App.FoodController = Ember.ArrayController.extend();
 //   {id:6},
 // ]
 
+//ViewHelpers
+Ember.Handlebars.registerBoundHelper('money', function(value){
+  return (value % 100 === 0 ? 
+          value / 100 + '.00' : 
+          parseInt(value / 100, 10) + '.' + value % 100);
+});
+
+
 // Models
 // This is a good way to start an application before even involving a server.
 // Then when data is ready you can stub or attach a ajax/JSON feed here instead.
@@ -77,8 +103,13 @@ App.Table = DS.Model.extend({
 });
 
 App.Tab = DS.Model.extend({
-  tabItems: DS.hasMany('App.TabItem')
-});
+  tabItems: DS.hasMany('App.TabItem'),
+  cents: function() {
+    return this.get('tabItems').getEach('cents').reduce(function(accum, item){
+      return accum + item;
+    }, 0);
+  }.property('tabItems.@each.cents')
+}); //calculates, caches, flushes, and notifies when changed
 
 App.TabItem = DS.Model.extend({
   cents: DS.attr('number'),
