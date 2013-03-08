@@ -14,6 +14,12 @@ App.ApplicationRoute = Ember.Route.extend({
   }
 });
 
+App.IndexRoute = Ember.Route.extend({
+  redirect: function() {
+    this.transitionTo('tables');
+  }
+})
+
 //Ember generates much of the detail code of the master - detail model 
 App.TablesRoute = Ember.Route.extend({
 	model: function() {
@@ -30,7 +36,9 @@ App.TablesRoute = Ember.Route.extend({
 //   model: function(params) {
 //     //debugger;
 //     return App.Table.find(params.id); //get all tables in this resturant
-//   }
+//   }//, events {
+    //Could put evented code here for food, to bubble 
+////}
 // });
 
 
@@ -43,24 +51,26 @@ App.TablesRoute = Ember.Route.extend({
 // be instiated at boot time
 
 //Controller name must match name of your route - ability to use each
-App.TablesController = Ember.ArrayController.extend();
+// Not needed - ember will generate 
+//App.TablesController = Ember.ArrayController.extend();
 
 // AUTO GENERATED
 //singular controller - proxy to attributes
 // App.TableController = Ember.ObjectController.extend();
 
 App.FoodController = Ember.ArrayController.extend({
-  addFood: function(food){
-    var table = this.controllerFor('table').get('model'),
-      tabItems = table.get('tab.tabItems');
-    tabItems.createRecord({
-      food: food,
-      cents: food.get('cents')
-    });
-  }
+  // addFood: function(food){
+  //   var table = this.controllerFor('table').get('model'),
+  //     tabItems = table.get('tab.tabItems');
+  //   tabItems.createRecord({
+  //     food: food,
+  //     cents: food.get('cents')
+  //   });
+  // }
 });
 
-App.TabController = Ember.ObjectController.extend();
+//Ember will generate Delete
+//App.TabController = Ember.ObjectController.extend();
 
 // Models
 
